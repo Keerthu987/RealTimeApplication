@@ -34,6 +34,7 @@ const SingleProductPage = ({ addToCart }) => {
             <div className="single_product_thumbnails">
               {product.images.map((image, index) => (
                 <img
+                  key={index}
                   src={`http://localhost:5000/products/${image}`}
                   alt={product.title}
                   className={selectedImage === index ? "selected_image" : ""}
