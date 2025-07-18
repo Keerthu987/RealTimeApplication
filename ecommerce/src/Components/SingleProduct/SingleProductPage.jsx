@@ -18,7 +18,7 @@ import useData from "../../Hooks/useData";
 //   ],
 //   stock: 10,
 // };
-const SingleProductPage = () => {
+const SingleProductPage = ({ addToCart }) => {
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -62,7 +62,12 @@ const SingleProductPage = () => {
               />
             </div>
 
-            <button className="search_button add_cart">Add to Cart</button>
+            <button
+              className="search_button add_cart"
+              onClick={() => addToCart(product, quantity)}
+            >
+              Add to Cart
+            </button>
           </div>{" "}
         </>
       )}

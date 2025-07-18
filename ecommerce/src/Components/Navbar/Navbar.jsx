@@ -9,7 +9,7 @@ import order from "../../assets/package.png";
 import lock from "../../assets/locked.png";
 import LinkWithIcon from "./LinkWithIcon";
 
-const Navbar = () => {
+const Navbar = ({ user, cartCount }) => {
   return (
     <nav className="navbar align_center">
       <div className="align_center">
@@ -28,14 +28,23 @@ const Navbar = () => {
       <div className="navbar_links align_center">
         <LinkWithIcon title="Home" link="/" emoji={Rocket} />
         <LinkWithIcon title="Products" link="/products" emoji={Star} />
-        <LinkWithIcon title="Login" link="/login" emoji={IDBtn} />
-        <LinkWithIcon title="SignUp" link="/signup" emoji={memo} />
-        <LinkWithIcon title="My Orders" link="/myorders" emoji={order} />
-        <LinkWithIcon title="Logout" link="/logout" emoji={lock} />
-        <NavLink to="/cart" className="align_center">
-          {" "}
-          Cart <p className="align_center cart_counts">0</p>
-        </NavLink>
+        {!user && (
+          <>
+            {" "}
+            <LinkWithIcon title="Login" link="/login" emoji={IDBtn} />
+            <LinkWithIcon title="SignUp" link="/signup" emoji={memo} />
+          </>
+        )}{" "}
+        {user && (
+          <>
+            <LinkWithIcon title="My Orders" link="/myorders" emoji={order} />
+            <LinkWithIcon title="Logout" link="/logout" emoji={lock} />
+            <NavLink to="/cart" className="align_center">
+              {" "}
+              Cart <p className="align_center cart_counts">{cartCount}</p>
+            </NavLink>
+          </>
+        )}
       </div>
     </nav>
   );

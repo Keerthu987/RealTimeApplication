@@ -2,8 +2,10 @@ import React from "react";
 import "./LoginPage.css";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { login } from "../../Services/UserServices";
 
 const schema = z.object({
   email: z
@@ -15,13 +17,28 @@ const schema = z.object({
     .min(8, { message: "Password should be atleast 8 characters" }),
 });
 const LoginPage = () => {
+  const [formError, setFormError] = useState("");
+  // let navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
 
-  const onSubmit = (formData) => console.log(formData);
+  const onSubmit = async (formData) => {
+    try {
+      await login(formData);
+      // console.log(res);
+      setFormError("");
+      // localStorage.setItem("token", data.token);
+      window.location = "/";
+      // navigate("/");
+    } catch (err) {
+      if (err.response && err.response.status === 400) {
+        setFormError(err.response.data.message);
+      }
+    }
+  };
   return (
     <section className="align_center form_page">
       <form className="authentication_form" onClick={handleSubmit(onSubmit)}>
@@ -53,6 +70,7 @@ const LoginPage = () => {
               <em className="form_error">{errors.password.message}</em>
             )}
           </div>
+          {formError && <em className="form_error">{formError} </em>}
           <button type="submit" className="search_button form_submit">
             Submit
           </button>
