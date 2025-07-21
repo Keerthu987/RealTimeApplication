@@ -5,7 +5,8 @@ import { useState } from "react";
 // import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login } from "../../Services/UserServices";
+import { getUser, login } from "../../Services/UserServices";
+import { Navigate, useLocation } from "react-router-dom";
 
 const schema = z.object({
   email: z
@@ -18,6 +19,7 @@ const schema = z.object({
 });
 const LoginPage = () => {
   const [formError, setFormError] = useState("");
+  const location = useLocation();
   // let navigate = useNavigate();
   const {
     register,
@@ -31,7 +33,8 @@ const LoginPage = () => {
       // console.log(res);
       setFormError("");
       // localStorage.setItem("token", data.token);
-      window.location = "/";
+      const { state } = location;
+      window.location = state ? state.from : "/";
       // navigate("/");
     } catch (err) {
       if (err.response && err.response.status === 400) {
@@ -39,6 +42,9 @@ const LoginPage = () => {
       }
     }
   };
+  if (getUser()) {
+    return <Navigate to="/" />;
+  }
   return (
     <section className="align_center form_page">
       <form className="authentication_form" onClick={handleSubmit(onSubmit)}>

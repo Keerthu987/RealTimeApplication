@@ -9,26 +9,31 @@ import { useEffect } from "react";
 import { useState } from "react";
 const ProductList = () => {
   const [search, setSearch] = useSearchParams();
-  const category = search.get("category");
+  const [sortBy, setSortBy] = useState("");
+  const [sortedProducts, setSortedProducts] = useState([]);
   const [page, setPage] = useState(1);
-  console.log(category);
-  console.log(page);
+  const category = search.get("category");
+  const searchQuery = search.get("search");
+
+  // console.log(category);
+  // console.log(page);
   const { data, error, isLoading } = useData(
     "/products",
     {
       params: {
+        search: searchQuery,
         category,
         perPage: 10,
         page,
       },
     },
-    [category, page]
+    [searchQuery, category, page]
   );
   useEffect(() => {
     const currentParams = Object.fromEntries([...search]);
     setSearch({ ...currentParams, page: 1 });
     setPage(1);
-  }, [category]);
+  }, [searchQuery, category]);
   useEffect(() => {
     const handleScroll = () => {
       const { scrollTop, clientHeight, scrollHeight } =
@@ -64,11 +69,36 @@ const ProductList = () => {
     setSearch({ ...currentParams, page: currentPage + 1 });
   };
   const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
+  useEffect(() => {
+    if (data && data.products) {
+      const products = [...data.products];
+      if (sortBy === "price desc") {
+        setSortedProducts(products.sort((a, b) => b.price - a.price));
+      } else if (sortBy === "price asc") {
+        setSortedProducts(products.sort((a, b) => a.price - b.price));
+      } else if (sortBy === "rate desc") {
+        setSortedProducts(
+          products.sort((a, b) => b.reviews.rate - a.reviews.rate)
+        );
+      } else if (sortBy === "rate asc") {
+        setSortedProducts(
+          products.sort((a, b) => a.reviews.rate - b.reviews.rate)
+        );
+      } else {
+        setSortedProducts(products);
+      }
+    }
+  }, [sortBy, data]);
   return (
     <section className="products_list_section">
       <header className="align_center products_list_header">
         <h2>Products</h2>
-        <select name="sort" id="" className="products_sorting">
+        <select
+          name="sort"
+          id=""
+          className="products_sorting"
+          onChange={(e) => setSortBy(e.target.value)}
+        >
           <option value="">Relevance</option>
           <option value="price desc">Price HIGH to LOW</option>
           <option value="price asc">Price LOW to HIGH</option>
@@ -81,17 +111,8 @@ const ProductList = () => {
         {!isLoading && error ? (
           <em className="form_error">{error}</em>
         ) : Array.isArray(data?.products) ? (
-          data.products.map((product) => (
-            <ProductCard
-              key={product._id}
-              id={product._id}
-              image={product.images[0]}
-              price={product.price}
-              title={product.title}
-              rating={product.reviews.rate}
-              ratingCounts={product.reviews.counts}
-              stock={product.stock}
-            />
+          sortedProducts.map((product) => (
+            <ProductCard key={product._id} product={product} />
           ))
         ) : (
           <p>Loading or no products found.</p>

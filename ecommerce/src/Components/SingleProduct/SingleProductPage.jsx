@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { memo, useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./SingleProductPage.css";
 import Loader from "./../Common/Loader";
 import QuantityInput from "./QuantityInput";
 import useData from "../../Hooks/useData";
+import CartContext from "../../context/cartContext";
+import UserContext from "../../context/UserContext";
 // const product = {
 //   id: 1,
 //   title: "Product Title",
@@ -18,9 +20,11 @@ import useData from "../../Hooks/useData";
 //   ],
 //   stock: 10,
 // };
-const SingleProductPage = ({ addToCart }) => {
+const SingleProductPage = () => {
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useContext(CartContext);
   const { id } = useParams();
+  const user = useContext(UserContext);
   const [selectedImage, setSelectedImage] = useState(0);
   const { data: product, error, isLoading } = useData(`/products/${id}`);
   return (
@@ -54,21 +58,25 @@ const SingleProductPage = ({ addToCart }) => {
             <p className="single_product_description">{product.description}</p>
             <p className="single_product_price">${product.price.toFixed(2)}</p>
 
-            <h2 className="quantity_title">Quantity:</h2>
-            <div className="align_center quantity_input">
-              <QuantityInput
-                quantity={quantity}
-                setQuantity={setQuantity}
-                stock={product.stock}
-              />
-            </div>
+            {user && (
+              <>
+                <h2 className="quantity_title">Quantity:</h2>
+                <div className="align_center quantity_input">
+                  <QuantityInput
+                    quantity={quantity}
+                    setQuantity={setQuantity}
+                    stock={product.stock}
+                  />
+                </div>
 
-            <button
-              className="search_button add_cart"
-              onClick={() => addToCart(product, quantity)}
-            >
-              Add to Cart
-            </button>
+                <button
+                  className="search_button add_cart"
+                  onClick={() => addToCart(product, quantity)}
+                >
+                  Add to Cart
+                </button>
+              </>
+            )}
           </div>{" "}
         </>
       )}
@@ -76,4 +84,4 @@ const SingleProductPage = ({ addToCart }) => {
   );
 };
 
-export default SingleProductPage;
+export default memo(SingleProductPage);
