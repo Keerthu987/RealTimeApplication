@@ -9,22 +9,38 @@ import UserContext from "./context/UserContext";
 import { getJwt, getUser } from "./Services/UserServices";
 import setAuthToken from "./utils/setAuthToken";
 import {
-  addToCartAPI,
+  // addToCartAPI,
   decreaseProductAPI,
-  getCartAPI,
+  // getCartAPI,
   increaseProductAPI,
-  removeFromCarAPI,
+  // removeFromCarAPI,
 } from "./Services/cartServices";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CartContext from "./context/cartContext";
 import cartReducer from "./reducers/cartReducer";
+import useData from "./Hooks/useData";
+import useAddToCart from "./Hooks/cart/useAddToCart";
+import useRemoveFromCart from "./Hooks/cart/useRemoveFromCart";
 const App = () => {
   const [user, setUser] = useState(null);
   const [cart, dispatchCart] = useReducer(cartReducer, []);
+  const { data: cartData, refetch } = useData("/cart", null, ["cart"]);
+
+  const addToCartMutation = useAddToCart();
+  const removeFromCartMutation = useRemoveFromCart();
 
   // const [cart, setCart] = useState([]);
-
+  useEffect(() => {
+    if (cartData) {
+      dispatchCart({ type: "GET_CART", payload: { products: cartData } });
+    }
+  }, [cartData]);
+  useEffect(() => {
+    if (user) {
+      refetch();
+    }
+  }, [user]);
   useEffect(() => {
     try {
       const token = getJwt();
@@ -49,25 +65,46 @@ const App = () => {
         type: "ADD_TO_CART",
         payload: { product: product, quantity: quantity },
       });
-      addToCartAPI(product._id, quantity)
-        .then((res) => {
-          toast.success("Product Added Successfully");
-        })
-        .catch((err) => {
-          toast.error("Login to add a Product to Cart");
-          console.log(err.response);
-          dispatchCart({ type: "REVERT_CART", payload: { cart } });
-        });
+      addToCartMutation.mutate(
+        { id: product._id, quantity },
+        {
+          onError: () => {
+            toast.error("Login to add a Product to Cart");
+
+            dispatchCart({ type: "REVERT_CART", payload: { cart } });
+          },
+        }
+      );
+
+      // addToCartAPI(product._id, quantity)
+      //   .then((res) => {
+      //     toast.success("Product Added Successfully");
+      //   })
+      //   .catch((err) => {
+      //     toast.error("Login to add a Product to Cart");
+      //     console.log(err.response);
+      //     dispatchCart({ type: "REVERT_CART", payload: { cart } });
+      //   });
     },
     [cart]
   );
   const removeFromCart = useCallback(
     (id) => {
       dispatchCart({ type: "REMOVE_FROM_CART", payload: { id } });
-      removeFromCarAPI(id).catch((err) => {
-        toast.error("Something went wrong");
-        dispatchCart({ type: "REVERT_CART", payload: { cart } });
-      });
+      removeFromCartMutation.mutate(
+        { id: id },
+        {
+          onError: () => {
+            toast.error("Something went wrong");
+
+            dispatchCart({ type: "REVERT_CART", payload: { cart } });
+          },
+        }
+      );
+      // removeFromCarAPI(id).catch((err) => {
+      //   toast.error("Something went wrong");
+      //   dispatchCart({ type: "REVERT_CART", payload: { cart } });
+      // });
     },
     [cart]
   );
@@ -98,20 +135,20 @@ const App = () => {
     },
     [cart]
   );
-  const getCart = useCallback(() => {
-    getCartAPI()
-      .then((res) => {
-        dispatchCart({ type: "GET_CART", payload: { products: res.data } });
-      })
-      .catch((err) => {
-        toast.error("Something went Wrong!");
-      });
-  }, [user]);
-  useEffect(() => {
-    if (user) {
-      getCart();
-    }
-  }, [user]);
+  // const getCart = useCallback(() => {
+  //   getCartAPI()
+  //     .then((res) => {
+  //       dispatchCart({ type: "GET_CART", payload: { products: res.data } });
+  //     })
+  //     .catch((err) => {
+  //       toast.error("Something went Wrong!");
+  //     });
+  // }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     getCart();
+  //   }
+  // }, [user]);
   return (
     <UserContext.Provider value={user}>
       <CartContext.Provider

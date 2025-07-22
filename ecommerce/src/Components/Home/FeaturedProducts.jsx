@@ -7,7 +7,12 @@ import ProductCardSkeleton from "./../Products/ProductCardSkeleton";
 const FeaturedProducts = () => {
   const skeletons = [1, 2, 3];
 
-  const { data, error, isLoading } = useData("/products/featured");
+  const { data, error, isLoading } = useData(
+    "/products/featured",
+    null,
+    ["products", "featured"],
+    10 * 60 * 60 * 1000
+  );
   // console.log(data);
   return (
     <section className="featured_products">

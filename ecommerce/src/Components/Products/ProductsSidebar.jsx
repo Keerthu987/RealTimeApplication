@@ -4,7 +4,12 @@ import "./ProductsSidebar.css";
 import useData from "../../Hooks/useData";
 
 const ProductsSidebar = () => {
-  const { data: categories, error } = useData("/category");
+  const { data: categories, error } = useData(
+    "/category",
+    null,
+    ["categories"],
+    24 * 60 * 60 * 1000
+  );
   return (
     <aside className="products_sidebar">
       <h3>Category</h3>
