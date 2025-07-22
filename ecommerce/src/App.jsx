@@ -8,13 +8,13 @@ import UserContext from "./context/UserContext";
 // import { jwtDecode } from "jwt-decode";
 import { getJwt, getUser } from "./Services/UserServices";
 import setAuthToken from "./utils/setAuthToken";
-import {
-  // addToCartAPI,
-  decreaseProductAPI,
-  // getCartAPI,
-  increaseProductAPI,
-  // removeFromCarAPI,
-} from "./Services/cartServices";
+// import {
+//   // addToCartAPI,
+//   // decreaseProductAPI,
+//   // getCartAPI,
+//   // increaseProductAPI,
+//   // removeFromCarAPI,
+// } from "./Services/cartServices";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CartContext from "./context/cartContext";
@@ -22,6 +22,7 @@ import cartReducer from "./reducers/cartReducer";
 import useData from "./Hooks/useData";
 import useAddToCart from "./Hooks/cart/useAddToCart";
 import useRemoveFromCart from "./Hooks/cart/useRemoveFromCart";
+import useUpdateCart from "./Hooks/cart/useUpdateCart";
 const App = () => {
   const [user, setUser] = useState(null);
   const [cart, dispatchCart] = useReducer(cartReducer, []);
@@ -29,7 +30,7 @@ const App = () => {
 
   const addToCartMutation = useAddToCart();
   const removeFromCartMutation = useRemoveFromCart();
-
+  const updateCartMutation = useUpdateCart();
   // const [cart, setCart] = useState([]);
   useEffect(() => {
     if (cartData) {
@@ -118,19 +119,38 @@ const App = () => {
       if (type === "increase") {
         updateCart[productIndex].quantity += 1;
         dispatchCart({ type: "GET_CART", payload: { products: updateCart } });
+        updateCartMutation.mutate(
+          { id, type },
+          {
+            onError: () => {
+              toast.error("Something went wrong");
 
-        increaseProductAPI(id).catch((err) => {
-          toast.error("Something went wrong!");
-          dispatchCart({ type: "REVERT_CART", payload: { cart } });
-        });
+              dispatchCart({ type: "REVERT_CART", payload: { cart } });
+            },
+          }
+        );
+        // increaseProductAPI(id).catch((err) => {
+        //   toast.error("Something went wrong!");
+        //   dispatchCart({ type: "REVERT_CART", payload: { cart } });
+        // });
       }
       if (type === "decrease") {
         updateCart[productIndex].quantity -= 1;
         dispatchCart({ type: "GET_CART", payload: { products: updateCart } });
-        decreaseProductAPI(id).catch((err) => {
-          toast.error("Something went wrong!");
-          dispatchCart({ type: "REVERT_CART", payload: { cart } });
-        });
+        updateCartMutation.mutate(
+          { id, type },
+          {
+            onError: () => {
+              toast.error("Something went wrong");
+
+              dispatchCart({ type: "REVERT_CART", payload: { cart } });
+            },
+          }
+        );
+        // decreaseProductAPI(id).catch((err) => {
+        //   toast.error("Something went wrong!");
+        //   dispatchCart({ type: "REVERT_CART", payload: { cart } });
+        // });
       }
     },
     [cart]

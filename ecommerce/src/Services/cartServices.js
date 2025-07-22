@@ -10,9 +10,9 @@ import apiClient from "../utils/api-client";
 // export function removeFromCarAPI(id) {
 //   return
 // }
-export function increaseProductAPI(id) {
-  return apiClient.patch(`/cart/increase/${id}`);
-}
+// export function increaseProductAPI(id) {
+//   return
+// }
 export function decreaseProductAPI(id) {
   return apiClient.patch(`/cart/decrease/${id}`);
 }
