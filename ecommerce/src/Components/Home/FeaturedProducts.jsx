@@ -1,5 +1,7 @@
 import React from "react";
 import "./FeaturedProducts.css";
+import { motion } from "framer-motion";
+
 import ProductCard from "./ProductCard";
 import useData from "./../../Hooks/useData";
 // import ProductCardSkeleton from "./ProductCard/ProductCardSkeleton"
@@ -16,7 +18,14 @@ const FeaturedProducts = () => {
   // console.log(data);
   return (
     <section className="featured_products">
-      <h2>Featured Products</h2>
+      <motion.h2
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, ease: "easeInOut" }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        Featured Products
+      </motion.h2>
       <div className="align_center featured_products_list">
         {/* <ProductCard />
         <ProductCard />
@@ -26,8 +35,18 @@ const FeaturedProducts = () => {
         {!isLoading && error ? (
           <em className="form_error">{error}</em>
         ) : Array.isArray(data) ? (
-          data.map((product) => (
-            <ProductCard key={product._id} product={product} />
+          data.map((product, index) => (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.25,
+                ease: "easeInOut",
+                delay: index * 0.5,
+              }}
+            >
+              <ProductCard key={product._id} product={product} />
+            </motion.div>
           ))
         ) : (
           <p>Loading or no products found.</p>

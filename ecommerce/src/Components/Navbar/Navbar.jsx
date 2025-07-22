@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./Navbar.css";
+import { motion } from "framer-motion";
+
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import Rocket from "../../assets/rocket.png";
 import Star from "../../assets/glowing-star.png";
@@ -64,7 +66,12 @@ const Navbar = () => {
   };
   // console.log(suggestions);
   return (
-    <nav className="navbar align_center">
+    <motion.nav
+      className="navbar align_center"
+      initial={{ opacity: 0, y: -30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, ease: "easeInOut" }}
+    >
       <div className="align_center">
         <h1 className="navbar_heading">CartWish</h1>
         <form className="align_center navbar_form" onSubmit={handleSubmit}>
@@ -127,7 +134,7 @@ const Navbar = () => {
           </>
         )}
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
